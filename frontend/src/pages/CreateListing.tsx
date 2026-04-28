@@ -92,8 +92,9 @@ export default function CreateListing() {
     setError(null)
     setSuccess(null)
 
-    if (!hasListingAccess) {
-      setError('Функция доступна с подпиской или после верификации продавца')
+    // If user doesn't have listing access, allow publishing only when size is left empty ("Не указывать").
+    if (!hasListingAccess && form.size) {
+      setError('Функция доступна после верификации продавца')
       return
     }
 
@@ -324,18 +325,15 @@ export default function CreateListing() {
         {error && <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>}
         {success && <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{success}</p>}
 
-        {!isSubscriptionLoading && !hasListingAccess && (
+        {!isSubscriptionLoading && !hasListingAccess && form.size && (
           <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-700">
-            Функция доступна с подпиской или после верификации продавца.{' '}
-            <Link to="/cart" className="font-semibold underline">
-              Перейти к оплате
-            </Link>
+            Функция доступна после <Link to="/verification" className="font-semibold underline">верификации</Link>
           </p>
         )}
 
         <button
           type="submit"
-          disabled={isSubmitting || isSubscriptionLoading || !hasListingAccess}
+          disabled={isSubmitting || isSubscriptionLoading || (!hasListingAccess && form.size !== '')}
           className="w-full rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-400"
         >
           {isSubmitting ? 'Публикация...' : 'Опубликовать'}
